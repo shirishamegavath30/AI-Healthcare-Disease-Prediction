@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diabetes Prediction</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<style>
+*{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
+body{margin:0;background:#f4f8fc;color:#222}
+.container{max-width:950px;margin:auto;padding:30px}
+.form-card{background:#fff;padding:30px;border-radius:20px;box-shadow:0 10px 25px rgba(0,0,0,.10)}
+.page-header{background:#1565f9;color:#fff;text-align:center;padding:30px 20px}
+.page-header h1{margin:0;font-size:34px}
+.page-header p{margin:10px 0 0}
+.section-card{background:#fff;border-left:5px solid #1565f9;padding:20px;border-radius:15px;margin-bottom:25px;box-shadow:0 5px 15px rgba(0,0,0,.06)}
+.section-card h2{color:#1565f9;margin-top:0}
+.grid,.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.input-group,.form-group{display:flex;flex-direction:column}
+label{font-weight:bold;margin-bottom:7px}
+input,select{width:100%;padding:11px;border:1px solid #ccc;border-radius:9px;font-size:15px;background:#fff}
+input:focus,select:focus{border-color:#1565f9;outline:none}
+.predict-btn,button{width:100%;padding:14px;background:#1565f9;color:#fff;border:0;border-radius:10px;font-size:17px;cursor:pointer;margin-top:10px}
+.predict-btn:hover,button:hover{background:#0d47d9}
+.result-card{margin-top:30px;padding:25px;border-radius:18px;text-align:center;background:#eef5ff;box-shadow:0 8px 20px rgba(0,0,0,.08)}
+.result-card h2{font-size:27px;margin:0 0 20px}
+.confidence-box{max-width:600px;margin:20px auto}
+.confidence-header{display:flex;justify-content:space-between;font-weight:bold;margin-bottom:8px}
+.confidence-bar{width:100%;height:18px;background:#d9d9d9;border-radius:20px;overflow:hidden}
+.confidence-fill {
+    height: 100%;
+    width: var(--confidence, 0%);
+}
+.high-risk{background:#e53935}.low-risk{background:#2e7d32}
+.suggestions{max-width:600px;margin:20px auto;text-align:left}
+.suggestions h3{color:#1565f9;text-align:center}
+.suggestions ul{line-height:1.8}
+.download-btn{display:block;padding:13px;background:#1565f9;color:#fff;text-decoration:none;border-radius:10px;font-weight:bold;margin:20px auto;max-width:500px}
+.download-btn:hover{background:#0d47d9}
+.back{display:inline-block;margin-top:25px;text-decoration:none;color:#1565f9;font-weight:bold}
+.error-message{background:#ffe5e5;color:#c62828;padding:15px;border-radius:10px;margin-top:20px;text-align:center;font-weight:bold}
+.loading-overlay{display:none;position:fixed;z-index:9999;inset:0;background:rgba(255,255,255,.95);align-items:center;justify-content:center;flex-direction:column;text-align:center}
+.spinner{width:60px;height:60px;border:6px solid #ddd;border-top:6px solid #1565f9;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+@media(max-width:700px){.grid,.form-grid{grid-template-columns:1fr}.container{padding:15px}.form-card{padding:20px}.page-header h1{font-size:28px}}
+</style>
+</head>
+<body>
+<header class="page-header">
+<h1>🩺 Diabetes Prediction</h1>
+<p>Enter patient health details for AI-based prediction.</p>
+</header>
+<div class="container"><div class="form-card">
+<form action="{{ url_for('predict_diabetes') }}" method="POST" id="diabetesForm">
+<div class="section-card"><h2>👤 Patient Information</h2><div class="grid">
+<div class="input-group"><label for="patient_name">Patient Name</label>
+<input type="text" id="patient_name" name="patient_name" placeholder="Enter patient name" required></div>
+</div></div>
+<div class="grid">
+<div class="input-group"><label for="pregnancies">Pregnancies</label><input type="number" id="pregnancies" name="pregnancies" min="0" required></div><div class="input-group"><label for="glucose">Glucose</label><input type="number" id="glucose" name="glucose" min="0" placeholder="Example: 120" required></div><div class="input-group"><label for="blood_pressure">Blood Pressure</label><input type="number" id="blood_pressure" name="blood_pressure" min="0" required></div><div class="input-group"><label for="skin_thickness">Skin Thickness</label><input type="number" id="skin_thickness" name="skin_thickness" min="0" required></div><div class="input-group"><label for="insulin">Insulin</label><input type="number" id="insulin" name="insulin" min="0" required></div><div class="input-group"><label for="bmi">BMI</label><input type="number" id="bmi" name="bmi" min="0" step="0.1" placeholder="Example: 24.5" required></div><div class="input-group"><label for="diabetes_pedigree">Diabetes Pedigree Function</label><input type="number" id="diabetes_pedigree" name="diabetes_pedigree" min="0" step="0.001" placeholder="Example: 0.372" required></div><div class="input-group"><label for="age">Age</label><input type="number" id="age" name="age" min="1" required></div></div>
+<button type="submit" class="predict-btn">🔍 Predict Diabetes</button>
+</form>
+{% if error %}<div class="error-message">⚠️ {{ error }}</div>{% endif %}
+
+{% if prediction %}
+<div class="result-card">
+
+    {% if risk_color == "red" %}
+        <h2 style="color:red;">{{ prediction }}</h2>
+    {% else %}
+        <h2 style="color:green;">{{ prediction }}</h2>
+    {% endif %}
+
+    <div class="confidence-box">
+        <div class="confidence-header">
+            <span>🎯 AI Confidence Score</span>
+            <strong>{{ confidence }}%</strong>
+        </div>
+        <div class="confidence-bar">
+            <div
+    class="confidence-fill {% if risk_color == 'red' %}high-risk{% else %}low-risk{% endif %}"
+    style="--confidence: {{ confidence }}%;">
+</div>
+        </div>
+        <p style="font-size:12px;color:#777;">AI confidence for this prediction</p>
+    </div>
+
+    <hr>
+
+    <div class="suggestions">
+        <h3>📋 Health Suggestions</h3>
+        <ul>
+        {% for item in advice %}
+            <li>{{ item }}</li>
+        {% endfor %}
+        </ul>
+    </div>
+
+    <a href="{{ url_for('download_report') }}" class="download-btn">
+        📄 Download Health Report (PDF)
+    </a>
+
+    <p style="font-size:13px;color:#555;margin-top:18px;">
+        For educational purposes only and should not replace professional medical advice or diagnosis.
+    </p>
+</div>
+{% endif %}
+<a href="/" class="back">← Back to Home</a>
+</div></div>
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <h2>🤖 AI is analyzing patient data...</h2>
+    <p>Please wait a few seconds.</p>
+</div>
+<script>
+document.getElementById("diabetesForm").addEventListener("submit",function(){
+    document.getElementById("loadingOverlay").style.display="flex";
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI in Healthcare - Disease Prediction</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<header>
+    <h1>AI in Healthcare - Disease Prediction</h1>
+    <p>Intelligent Disease Prediction using Artificial Intelligence</p>
+</header>
+<nav class="navbar">
+    <a href="/">🏠 Home</a>
+    <a href="/diabetes">🩸 Diabetes</a>
+    <a href="/heart">❤️ Heart</a>
+    <a href="/cancer">🎗️ Cancer</a>
+</nav>
+
+<section class="hero">
+    <h2>Welcome to Our AI Healthcare System</h2>
+
+    <p>
+        This system predicts disease risk using Machine Learning and Deep Learning
+        for Diabetes, Heart Disease, and Breast Cancer Screening.
+    </p>
+</section>
+
+<!-- Dataset Dashboard -->
+
+<section class="dashboard">
+
+    <div class="stat-card">
+        <h3>🩸 Diabetes</h3>
+        <h1 class="counter" data-target="768">0</h1>
+        <p>Patient Records</p>
+    </div>
+
+    <div class="stat-card">
+        <h3>❤️ Heart</h3>
+        <h1 class="counter" data-target="920">0</h1>
+        <p>Clinical Records</p>
+    </div>
+
+    <div class="stat-card">
+        <h3>🎗️ Cancer</h3>
+        <h1 class="counter" data-target="569">0</h1>
+        <p>Diagnostic Records</p>
+    </div>
+
+</section>
+
+<!-- Disease Modules -->
+
+<section class="cards">
+
+    <a href="/diabetes" class="card-link">
+        <div class="card">
+            <h3>🩸 Diabetes</h3>
+            <p>Predict diabetes risk from patient health data.</p>
+        </div>
+    </a>
+
+    <a href="/heart" class="card-link">
+        <div class="card">
+            <h3>❤️ Heart Disease</h3>
+            <p>Analyze clinical parameters for heart disease risk.</p>
+        </div>
+    </a>
+
+    <a href="/cancer" class="card-link">
+        <div class="card">
+            <h3>🧬 Cancer Screening</h3>
+            <p>Screen breast cancer risk using AI prediction.</p>
+        </div>
+    </a>
+
+</section>
+
+<!-- Recent History -->
+
+<section class="history-section">
+
+    <div class="history-card">
+
+        <h2>🏥 Patient Dashboard</h2>
+        <p class="history-subtitle">Recent AI-generated patient reports</p>
+
+        {% if history %}
+
+            <div class="history-grid">
+
+                {% for item in history %}
+
+                <div class="history-item">
+
+                    <div class="history-top">
+                        <div>
+                            <h3>{{ item.patient }}</h3>
+                            <p>{{ item.module }}</p>
+                        </div>
+
+                        {% if "High" in item.result %}
+                            <span class="badge high">High Risk</span>
+                        {% else %}
+                            <span class="badge low">Low Risk</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="history-bottom">
+                        <span>🎯 {{ item.confidence }}</span>
+                        <span>🕒 {{ item.time }}</span>
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="empty-history">
+                <icon name=clipboard color=secondary size=2xl />
+                <p>No patient reports yet.</p>
+                <caption>Your recent predictions will appear here.</caption>
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+<!-- How AI Works -->
+
+<section class="how-ai">
+
+    <h2>🤖 How Our AI Healthcare System Works</h2>
+
+    <div class="steps">
+
+        <div class="step">
+            <div class="icon">📝</div>
+            <h3>Enter Health Details</h3>
+            <p>Users enter clinical values such as glucose, blood pressure, cholesterol, or breast tumor measurements.</p>
+        </div>
+
+        <div class="step">
+            <div class="icon">⚙️</div>
+            <h3>AI Processes Data</h3>
+            <p>Machine Learning models compare the values with patterns learned from thousands of medical records.</p>
+        </div>
+
+        <div class="step">
+            <div class="icon">📊</div>
+            <h3>Risk Prediction</h3>
+            <p>The system displays Low Risk or High Risk with confidence percentage and health suggestions.</p>
+        </div>
+
+        <div class="step">
+            <div class="icon">🏥</div>
+            <h3>Take Action</h3>
+            <p>The result encourages users to seek timely medical consultation instead of waiting for symptoms to worsen.</p>
+        </div>
+
+    </div>
+
+</section>
+
+<!-- AI Performance -->
+
+<section class="performance">
+
+    <h2>📊 AI Model Performance</h2>
+
+    <div class="performance-card">
+
+        <div class="model">
+            <div class="model-header">
+                <span>🩸 Diabetes</span>
+                <strong>{{ accuracy["Diabetes"] }}%</strong>
+            </div>
+
+            <div class="bar">
+                <div class="fill diabetes-fill" style="width: {{ accuracy['Diabetes'] }}%;"></div>
+            </div>
+        </div>
+
+        <div class="model">
+            <div class="model-header">
+                <span>❤️ Heart Disease</span>
+                <strong>{{ accuracy["Heart Disease"] }}%</strong>
+            </div>
+
+            <div class="bar">
+                <div class="fill heart-fill" style="width: {{ accuracy['Heart Disease'] }}%;"></div>
+            </div>
+        </div>
+
+        <div class="model">
+            <div class="model-header">
+                <span>🎗️ Breast Cancer</span>
+                <strong>{{ accuracy["Breast Cancer"] }}%</strong>
+            </div>
+
+            <div class="bar">
+                <div class="fill cancer-fill" style="width: {{ accuracy['Breast Cancer'] }}%;"></div>
+            </div>
+        </div>
+
+    </div>
+
+</section>
+<section class="charts-section">
+
+    <h2>📈 Healthcare Analytics Dashboard</h2>
+
+    <div class="charts-grid">
+
+        <div class="chart-card">
+            <h3>Dataset Records</h3>
+            <canvas id="datasetChart"></canvas>
+        </div>
+
+        <div class="chart-card">
+            <h3>Dataset Distribution</h3>
+            <canvas id="pieChart"></canvas>
+        </div>
+
+        <div class="chart-card full-width">
+            <h3>AI Model Accuracy</h3>
+            <canvas id="accuracyChart"></canvas>
+        </div>
+
+    </div>
+
+</section>
+<section class="features">
+
+    <h2>✨ Key Features</h2>
+
+    <div class="feature-grid">
+
+        <div class="feature-box">
+            <div class="feature-icon">🔒</div>
+            <h3>Secure</h3>
+            <p>Patient data remains within the application.</p>
+        </div>
+
+        <div class="feature-box">
+            <div class="feature-icon">⚡</div>
+            <h3>Fast</h3>
+            <p>Predictions are generated instantly.</p>
+        </div>
+
+        <div class="feature-box">
+            <div class="feature-icon">🧠</div>
+            <h3>AI Powered</h3>
+            <p>Machine Learning models analyze clinical data.</p>
+        </div>
+
+        <div class="feature-box">
+            <div class="feature-icon">📄</div>
+            <h3>PDF Reports</h3>
+            <p>Download prediction reports.</p>
+        </div>
+
+    </div>
+
+</section>
+
+<footer class="footer">
+
+    <div class="footer-content">
+
+        <div class="footer-section">
+            <h3>🏥 AI Healthcare</h3>
+            <p>Intelligent Disease Prediction using Machine Learning and Deep Learning.</p>
+        </div>
+
+        <div class="footer-section">
+            <h3>Quick Links</h3>
+            <a href="/">Home</a>
+            <a href="/diabetes">Diabetes</a>
+            <a href="/heart">Heart Disease</a>
+            <a href="/cancer">Cancer Screening</a>
+        </div>
+
+        <div class="footer-section">
+            <h3>Project</h3>
+            <p>Major Project – Internvision</p>
+            <p>B.Tech AIML</p>
+        </div>
+
+    </div>
+
+    <hr>
+
+    <p class="copyright">
+        © 2026 AI Healthcare. For educational purposes only.
+    </p>
+
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+new Chart(document.getElementById("datasetChart"),{
+    type:"bar",
+    data:{
+        labels:["Diabetes","Heart","Cancer"],
+        datasets:[{
+            label:"Records",
+            data:[768,920,569],
+            backgroundColor:["#f39c12","#e74c3c","#2ecc71"]
+        }]
+    },
+    options:{responsive:true}
+});
+
+new Chart(document.getElementById("pieChart"),{
+    type:"pie",
+    data:{
+        labels:["Diabetes","Heart","Cancer"],
+        datasets:[{
+            data:[768,920,569],
+            backgroundColor:["#f39c12","#e74c3c","#2ecc71"]
+        }]
+    }
+});
+
+new Chart(document.getElementById("accuracyChart"),{
+    type:"bar",
+    data:{
+        labels:["Diabetes","Heart Disease","Breast Cancer"],
+        datasets:[{
+            label:"Accuracy %",
+            data:[78,84,98],
+            backgroundColor:["#f39c12","#e74c3c","#2ecc71"]
+        }]
+    },
+    options:{
+        responsive:true,
+        scales:{
+            y:{
+                beginAtZero:true,
+                max:100
+            }
+        }
+    }
+});
+</script>
+<script>
+const counters = document.querySelectorAll(".counter");
+
+counters.forEach(counter => {
+    const target = +counter.getAttribute("data-target");
+    let count = 0;
+
+    const updateCounter = () => {
+        const increment = Math.ceil(target / 60);
+
+        if (count < target) {
+            count += increment;
+            counter.innerText = count > target ? target : count;
+            requestAnimationFrame(updateCounter);
+        } else {
+            counter.innerText = target;
+        }
+    };
+
+    updateCounter();
+});
+</script>
+</body>
+</html>
